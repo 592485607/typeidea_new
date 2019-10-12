@@ -11,47 +11,46 @@ from typeidea.base_admin import BaseOwnerAdmin
 """ 在同一页面编辑关联的数据，如在分类页面直接编辑文章 """
 class PostInline(admin.TabularInline):  # TabularInline 样式不同，可选择继承admin.StackedInline获取不同的展示样式
     fields = ('title','desc','status',)
-    extra = 0
+    extra = 1   # 控制额外多几个
     model = Post
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+@admin.register(Category,site=custom_site)
+class CategoryAdmin(BaseOwnerAdmin):  # class CategoryAdmin(admin.ModelAdmin):
     inlines = [PostInline,]
 
     list_display = ('name','status','is_nav','owner','created_time','post_count')
     fields = ('name','status','is_nav')
 
-
-    def save_model(self, request, obj, form, change):
-        """
-        重写 save_model方法, Given a model instance save it to the database.
-         request.user为当前登录的用户
-         request为当前请求，obj为当前要保存的对象，form是页面提交过来的表单之后的对象，change是标志保存的数据是新增还是更新；
-        """
-        obj.owner = request.user
-        # print(obj.owner)
-        return super(CategoryAdmin,self).save_model(request,obj,form,change)
+    # def save_model(self, request, obj, form, change):
+    #     """
+    #     重写 save_model方法, Given a model instance save it to the database.
+    #      request.user为当前登录的用户
+    #      request为当前请求，obj为当前要保存的对象，form是页面提交过来的表单之后的对象，change是标志保存的数据是新增还是更新；
+    #     """
+    #     obj.owner = request.user
+    #     # print(obj.owner)
+    #     return super(CategoryAdmin,self).save_model(request,obj,form,change)
 
     # 展示该分类有多少篇文章的统计
     def post_count(self,obj):
         return obj.post_set.count()
     post_count.short_description = '文章数量'
 
-@admin.register(Tag)  # admin.site.register(Tag,TagAdmin)
-class TagAdmin(admin.ModelAdmin):
+@admin.register(Tag,site=custom_site)  # admin.site.register(Tag,TagAdmin)
+class TagAdmin(BaseOwnerAdmin): # class TagAdmin(admin.ModelAdmin):
     list_display = ('name','status','created_time')
     fields = ('name','status')
 
-    def save_model(self, request, obj, form, change):
-        """
-         Given a model instance save it to the database.
-        """
-        obj.owner = request.user
-        return super(TagAdmin,self).save_model(request,obj,form,change)
-
-    def get_queryset(self, request):
-         qs = super().get_queryset(request)
-         return qs.filter(owner=request.user)
+    # def save_model(self, request, obj, form, change):
+    #     """
+    #      Given a model instance save it to the database.
+    #     """
+    #     obj.owner = request.user
+    #     return super(TagAdmin,self).save_model(request,obj,form,change)
+    #
+    # def get_queryset(self, request):
+    #      qs = super().get_queryset(request)
+    #      return qs.filter(owner=request.user)
 
 class CategoryOwnerFilter(admin.SimpleListFilter):
     """自定义过滤器，只展示当前用户分类. P119"""
@@ -72,7 +71,7 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
         return queryset
 
 @admin.register(Post,site=custom_site)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(BaseOwnerAdmin): #  class PostAdmin(admin.ModelAdmin)
     # 引用自定义Form
     form = PsotAdminForm
 
@@ -131,8 +130,8 @@ class PostAdmin(admin.ModelAdmin):
         })
     )
 
-    filter_horizontal = ('tag',)   # 控制多对多字段横向展示
-    # filter_vertical = ('tag',)   # 控制多对多字段纵向展示
+    # filter_horizontal = ('tag',)   # 控制多对多字段横向展示
+    filter_vertical = ('tag',)   # 控制多对多字段纵向展示
 
     # 展示自定义字段
     def operator(self,obj):
@@ -141,20 +140,19 @@ class PostAdmin(admin.ModelAdmin):
             # reverse('admin:blog_post_change',args=(obj.id,))
             reverse('cus_admin:blog_post_change',args=(obj.id,))  # 来源custom_site.py中的 custom_site = CustomSite(name='cus_admin')
         )
-     # 指定表头的展示文案
-    operator.short_description = '操作'
+    operator.short_description = '操作'    # 指定表头的展示文案
 
-    def save_model(self, request, obj, form, change):
-        """
-        Given a model instance save it to the database.
-        """
-        obj.owner = request.user
-        return super(PostAdmin,self).save_model(request,obj,form,change)
-
-    def get_queryset(self, request):
-        """ 只能查看到作者为自己的数据 """
-        qs = super(PostAdmin,self).get_queryset(request)
-        return qs.filter(owner=request.user)
+    # def save_model(self, request, obj, form, change):
+    #     """
+    #     Given a model instance save it to the database.
+    #     """
+    #     obj.owner = request.user
+    #     return super(PostAdmin,self).save_model(request,obj,form,change)
+    #
+    # def get_queryset(self, request):
+    #     """ 只能查看到作者为自己的数据 """
+    #     qs = super(PostAdmin,self).get_queryset(request)
+    #     return qs.filter(owner=request.user)
 
     """ 自定义静态资源引入，
         通过自定义的Media类来往页面上增加想要添加的javaScript及CSS资源 
@@ -165,187 +163,6 @@ class PostAdmin(admin.ModelAdmin):
     #     }
     #     js = ('https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/js/bootstrap.bundle.js',)
 
-# class PostInline(admin.TabularInline):
-#     fields = ('title','desc')
-#     extra = 0
-#     model = Post
-#
-# @admin.register(Category,site=custom_site)
-# class CategoryAdmin(BaseOwnerAdmin):
-#     list_display = ('name','status','is_nav','post_count','created_time')
-#     fields = ('name','status','owner','is_nav')
-#     inlines = [PostInline,]
-#
-#     def post_count(self,obj):
-#         return obj.post_set.count()
-#
-#     post_count.short_description = '文章数量'
-#
-# @admin.register(Tag,site=custom_site)  # admin.site.register(Tag,TagAdmin)
-# class TagAdmin(BaseOwnerAdmin):
-#     list_display = ('name','status','created_time')
-#     fields = ('name','status')
-
-# class CategoryOwnerFilter(admin.SimpleListFilter):
-#     """自定义过滤器，只展示当前用户分类. P119"""
-#     title = "分类过滤"
-#     parameter_name = 'owner_category'   #查询时URL参数的名称，如查询分类id为1时，URL后面的Query部分是 ?owner_category=1
-#
-#     def lookups(self, request, model_admin):
-#         """返回要展示的内容和查询用的id（如?owner_category=1) """
-#         return Category.objects.filter(owner=request.user).values_list('id','name')
-#
-#     def queryset(self, request, queryset):
-#         category_id = self.value()
-#         if category_id:
-#             return queryset.filter(category_id=self.value())
-#         return queryset
-
-# @admin.register(Post,site=custom_site)
-# class PostAdmin(BaseOwnerAdmin):
-#     form = PsotAdminForm
-#
-#     list_display = [
-#         'title','category','status',
-#         'created_time','owner','operator',
-#     ]
-#     list_display_links = []
-#
-#     list_filter = [CategoryOwnerFilter]
-#     search_fields = ['title','category__name']
-#
-#     actions_on_top = True
-#     actions_on_bottom = False
-#
-#     #编辑页面
-#     save_on_top = True
-#
-#     exclude = ('owner',)
-#
-#     # fields = (
-#     #     ('category','title'),
-#     #     'desc',
-#     #     'status',
-#     #     'content',
-#     #     'tag',
-#     # )
-#
-#     fieldsets = (
-#         ('基础配置',{
-#             'description':'基础配置描述',
-#             'fields':(
-#                 ('title','category'),
-#                 'status',
-#             ),
-#         }),
-#         ('内容',{
-#             'fields':(
-#                 'desc',
-#                 'content',
-#             ),
-#         }),
-#         ('额外信息',{
-#             'classes':('collapse',),
-#             'fields':('tag',),
-#         })
-#     )
-#     filter_horizontal = ('tag',)
-#     # filter_vertical = ('tag',)
-#
-#     def operator(self,obj):
-#         return format_html(
-#             '<a href = "{}">编辑</a>',
-#             reverse('cus_admin:blog_post_change',args=(obj.id,))
-#         )
-#     operator.short_description = '操作'
-#
-#     # def save_model(self, request, obj, form, change):
-#     #     """
-#     #     Given a model instance save it to the database.
-#     #     """
-#     #     obj.owner = request.user
-#     #     return super(PostAdmin,self).save_model(request,obj,form,change)
-#     #
-#     # def get_queryset(self, request):
-#     #     qs = super(PostAdmin,self).get_queryset(request)
-#     #     return qs.filter(owner=request.user)
-#
-# @admin.register(Post,site=custom_site)
-# class PostAdmin(BaseOwnerAdmin):
-#     form = PsotAdminForm
-#
-#     list_display = [
-#         'title','category','status',
-#         'created_time','owner','operator',
-#     ]
-#     list_display_links = []
-#
-#     list_filter = [CategoryOwnerFilter]
-#     search_fields = ['title','category__name']
-#
-#     actions_on_top = True
-#     actions_on_bottom = False
-#
-#     #编辑页面
-#     save_on_top = True
-#
-#     exclude = ('owner',)
-#
-#     # fields = (
-#     #     ('category','title'),
-#     #     'desc',
-#     #     'status',
-#     #     'content',
-#     #     'tag',
-#     # )
-#
-#     fieldsets = (
-#         ('基础配置',{
-#             'description':'基础配置描述',
-#             'fields':(
-#                 ('title','category'),
-#                 'status',
-#             ),
-#         }),
-#         ('内容',{
-#             'fields':(
-#                 'desc',
-#                 'content',
-#             ),
-#         }),
-#         ('额外信息',{
-#             'classes':('collapse',),
-#             'fields':('tag',),
-#         })
-#     )
-#     filter_horizontal = ('tag',)
-#     # filter_vertical = ('tag',)
-#
-#     def operator(self,obj):
-#         return format_html(
-#             '<a href = "{}">编辑</a>',
-#             reverse('cus_admin:blog_post_change',args=(obj.id,))
-#         )
-#     operator.short_description = '操作'
-#
-#     # def save_model(self, request, obj, form, change):
-#     #     """
-#     #     Given a model instance save it to the database.
-#     #     """
-#     #     obj.owner = request.user
-#     #     return super(PostAdmin,self).save_model(request,obj,form,change)
-#     #
-#     # def get_queryset(self, request):
-#     #     qs = super(PostAdmin,self).get_queryset(request)
-#     #     return qs.filter(owner=request.user)
-#
-#     class Media:
-#         css = {
-#             'all':("https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css",),
-#         }
-#         js = ('https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/js/bootstrap.bundle.js',)
-#
-#
 # @admin.register(LogEntry,site=custom_site)
 # class LogEntryAdmin(admin.ModelAdmin):
 #     list_display = ['object_repr','object_id','action_flag','user',
