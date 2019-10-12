@@ -6,10 +6,10 @@ from django.utils.html import format_html
 from .models import Post,Category,Tag
 from .adminforms import PsotAdminForm
 from typeidea.custom_site import custom_site
-# from typeidea.base_admin import BaseOwnerAdmin
+from typeidea.base_admin import BaseOwnerAdmin
 
 """ 在同一页面编辑关联的数据，如在分类页面直接编辑文章 """
-class PostInline(admin.TabularInline):  # TabularInline 样式不同
+class PostInline(admin.TabularInline):  # TabularInline 样式不同，可选择继承admin.StackedInline获取不同的展示样式
     fields = ('title','desc','status',)
     extra = 0
     model = Post
@@ -49,9 +49,9 @@ class TagAdmin(admin.ModelAdmin):
         obj.owner = request.user
         return super(TagAdmin,self).save_model(request,obj,form,change)
 
-    # def get_queryset(self, request):
-    #      qs = super(PostAdmin,self).get_queryset(request)
-    #      return qs.filter(owner=request.user)
+    def get_queryset(self, request):
+         qs = super().get_queryset(request)
+         return qs.filter(owner=request.user)
 
 class CategoryOwnerFilter(admin.SimpleListFilter):
     """自定义过滤器，只展示当前用户分类. P119"""
@@ -62,6 +62,9 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
         """返回要展示的内容和查询用的id（如?owner_category=1) """
         return Category.objects.filter(owner=request.user).values_list('id','name')
 
+    """
+        The get_queryset method on a ModelAdmin returns a QuerySet of all model instances that can be edited by the admin site. 
+    """
     def queryset(self, request, queryset):
         category_id = self.value()
         if category_id:
@@ -136,7 +139,7 @@ class PostAdmin(admin.ModelAdmin):
         return format_html(
             '<a href = "{}">编辑</a>',
             # reverse('admin:blog_post_change',args=(obj.id,))
-            reverse('cus_admin:blog_post_change',args=(obj.id,))  # cus_admin ？
+            reverse('cus_admin:blog_post_change',args=(obj.id,))  # 来源custom_site.py中的 custom_site = CustomSite(name='cus_admin')
         )
      # 指定表头的展示文案
     operator.short_description = '操作'
