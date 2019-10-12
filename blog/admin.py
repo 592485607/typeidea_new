@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
-# from django.contrib.admin.models import LogEntry
+from django.contrib.admin.models import LogEntry
 
 from .models import Post,Category,Tag
 from .adminforms import PsotAdminForm
@@ -82,7 +82,7 @@ class PostAdmin(BaseOwnerAdmin): #  class PostAdmin(admin.ModelAdmin)
     ]
 
     # 配置哪些字段可以作为链接，点击它们，进入编辑页面
-    list_display_links = ['title','category']
+    list_display_links = ['title']
 
     # 配置页面过滤器，需要哪些字段来过滤列表页
     list_filter = [CategoryOwnerFilter]
@@ -163,7 +163,29 @@ class PostAdmin(BaseOwnerAdmin): #  class PostAdmin(admin.ModelAdmin)
     #     }
     #     js = ('https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/js/bootstrap.bundle.js',)
 
-# @admin.register(LogEntry,site=custom_site)
-# class LogEntryAdmin(admin.ModelAdmin):
-#     list_display = ['object_repr','object_id','action_flag','user',
-#                     'change_message']
+# from django.contrib.admin.models import LogEntry
+# from django.contrib.admin.options import get_content_type_for_model
+#
+# # 查询某个对象的变更，如，以下拿到文章id为1的所有变更记录
+# post = Post.objects.get(id=1)
+# log_entries = LogEntry.objects.filter(
+#     content_type_id = get_content_type_for_model(post).pk,
+#     object_id = post.id,
+# )
+
+
+"""
+    LogEntry.action_time:    The date and time of the action.
+    
+    LogEntry.user:   The user (an AUTH_USER_MODEL instance) who performed the action.
+    
+    LogEntry.content_type:  The ContentType of the modified object.
+
+    LogEntry.object_id: The textual representation of the modified object’s primary key.
+
+    LogEntry.object_repr: The object`s repr() after the modification.
+"""
+@admin.register(LogEntry,site=custom_site)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display = ['object_repr','object_id','action_flag','content_type','user',
+                    'change_message']
