@@ -1,4 +1,0 @@
--i http://pypi.doubanio.com/simple
-Django == 1.11
-
--e . 
