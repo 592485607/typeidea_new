@@ -5,5 +5,10 @@
 3.增加comment应用，用于存放评论相关; <br/>
 
 页面需求：
-博客首页：
+博客首页：http://域名/
+博文详情页：http://域名/post/<post_id>.html
+分类列表页：http://域名/category/<category_id>/
+标签分类列表页：http://域名/tag/<tag_id>/
+友链展示页：http://域名/links/
+
 
