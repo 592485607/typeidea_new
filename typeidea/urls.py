@@ -26,10 +26,12 @@ from .custom_site import custom_site
 """
 urlpatterns = [
     url(r'^$', post_list),   # 用户访问博客首页，把请求传递到post_list函数中
-    url(r'^category/（？P<category_id>\d+)/$', post_list), # （？P<category_id>\d+) 带分组正则表达
-    url(r'^tag/(?p<tag_id>\d+).html$', post_detail),
+    url(r'^category/(?P<category_id>\d+)/$', post_list), # (?P<category_id>\d+) 带分组正则表达
+    url(r'^tag/(?P<tag_id>\d+)/$', post_list),
+    url(r'^post/(?P<post_id>\d+).html$', post_detail),
     url(r'^links/$', links),
 
     url(r'^super_admin/', admin.site.urls),
     url(r'^admin/', custom_site.urls),     # 基于URL上划分两套后台地址，一套管理用户，另一套管理业务
 ]
+

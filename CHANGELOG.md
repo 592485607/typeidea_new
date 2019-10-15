@@ -16,5 +16,5 @@
 文章页View  <br/>
 友链页View  <br/>
 
-流程：定义url->编写view
+流程：定义url->编写view->配置模板
 

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'typeidea',  # 模板放在这个App目录下
     'blog',
     'config',
     'comment',
