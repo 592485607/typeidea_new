@@ -16,8 +16,20 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
+from blog.views import post_list,post_detail
+from config.views import links
 from .custom_site import custom_site
+
+"""
+    URL参数解释
+    url(<正则或字符串>,<view funtion>,<固定参数context>,<url的名称>)
+"""
 urlpatterns = [
+    url(r'^$', post_list),   # 用户访问博客首页，把请求传递到post_list函数中
+    url(r'^category/（？P<category_id>\d+)/$', post_list), # （？P<category_id>\d+) 带分组正则表达
+    url(r'^tag/(?p<tag_id>\d+).html$', post_detail),
+    url(r'^links/$', links),
+
     url(r'^super_admin/', admin.site.urls),
     url(r'^admin/', custom_site.urls),     # 基于URL上划分两套后台地址，一套管理用户，另一套管理业务
 ]
