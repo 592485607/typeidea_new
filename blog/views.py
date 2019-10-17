@@ -183,8 +183,8 @@ class TagView(IndexView):
     """重写get_context_data，用来获取上下文数据并传入模板"""
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
-        tag_id = self.kwargs.get('tag_id')
-        tag = get_object_or_404(Category,pk=tag_id)
+        tag_id = self.kwargs.get('tag_id')  #
+        tag = get_object_or_404(Category,pk=tag_id) # 快捷方式，获取对象实例，如不存在，则抛出404错误
         context.update({
             'tag':tag
         })
