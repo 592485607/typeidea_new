@@ -81,6 +81,9 @@ class Post(models.Model):
     tag = models.ManyToManyField(Tag,verbose_name='标签')
     owner = models.ForeignKey(User,verbose_name='作者')
     created_time  = models.DateTimeField(auto_now_add=True,verbose_name='创建时间')
+    """ 调整模型，增加字段pv,uv，统计文章访问量 """
+    pv = models.PositiveIntegerField(default=1)
+    uv = models.PositiveIntegerField(default=1)
 
     class Meta:
         # 通过Meta配置它的展示名称为文章，排序规则根据 id 进行降序排列
@@ -122,3 +125,8 @@ class Post(models.Model):
     def latest_posts(cls):
         queryset = cls.objects.filter(status=Post.STATUS_NORMAL)
         return queryset
+
+    @classmethod
+    def hot_posts(cls):
+        return cls.objects.filter(status=cls.STATUS_NORMAL).order_by('-pv')
+
