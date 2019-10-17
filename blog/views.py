@@ -1,7 +1,11 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from .models import Post,Tag,Category
 from config.models import SideBar
 from django.http import HttpResponse
+
+from django.views import View
+from django.views.generic import DeleteView,ListView
 
 # def post_list(request,category_id = None,tag_id = None):
 #     content = 'post_list category_id={category_id},tag_id={tag_id}'.format(
@@ -107,3 +111,87 @@ def post_detail(request,post_id):
     # return render(request, 'blog/detail.html', context={'post':post})
     return render(request, 'blog/detail.html', context=context)
 
+"""
+    什么时候使用类方式实现视图逻辑，特征：代码逻辑被重复使用，同时有需要共享数据时； 
+    class-based view 是一个可接受请求，返回响应的可调用对象。
+    view:基础的view，实现基于HTTP方法的分发（dispatch）逻辑，比如，GET请求会调用对应的get方法
+    TemplateView，继承View，是可以直接用来返回指定的模板。实现了get方法，传递变量到模板中进行数据展示
+    DetailView，继承View，实现了get方法，且可绑定一个模板，获取单个实例数据
+    ListView，继承View，实现了get方法，通过绑定模板来批量获取数据
+    
+    DetailView提供属性和接口有：
+        model 属性,指定当前要使用的Model
+        queryset 属性,,跟model一样，两者中选一个。设定基础数据集，Model的设定没有过滤功能，可通过queryset=
+            Post.objects.fileter(status=Post.STATUS_NORMAL)进行过滤； 
+        template_name 属性,，模板名称
+        get_queryset 接口,同queryset方法一样，用来获取数据，如果设定了queryset，则直接返回queryset;
+        get_object 接口，根据URL参数，从queryset上获取对应的实例；
+        get_context_data 接口，获取渲染到模板中的上下文。
+    
+    ListView 跟DetailView类似，但ListView是获取多条数据； 
+"""
+class MyView(View):
+    """ 明显好处，解耦了HTTP 方法的请求，如GET，POST...等，
+        如果需要增加POST请求逻辑，不需要修改原有函数，只需要重写即可
+    """
+    def get(self,request):
+        return HttpResponse('result')
+
+class PostDetailView(DeleteView):
+    model = Post
+    template_name = 'blog/detail.html'
+
+class CommonViewMixin:
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(*kwargs)
+        context.update({
+            'sidebars':SideBar.get_all()
+        })
+        context.update(Category.get_navs())
+        return context
+
+class IndexView(CommonViewMixin,ListView):
+    """
+        queryset 中的数据需要根据当前选择的分类或标签进行过滤；
+        渲染到模板中的数据需要加上当前选择的分类数据。
+        故需要重写两个方法，一个是get_context_data，用来获取上下文数据并传入模板；
+        一个是get_queryset,用来获取指定Model或Queryset的数据
+    """
+    queryset = Post.latest_posts()
+    paginate_by = 1
+    context_object_name = 'post_list'   # 如果不设此项，在模板中需使用object_list 变量
+    template_name = 'blog/list.html'
+
+class CategoryView(IndexView):
+    """重写get_context_data，用来获取上下文数据并传入模板"""
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        category_id = self.kwargs.get('category_id')
+        category = get_object_or_404(Category,pk=category_id)
+        context.update({
+            'category':category
+        })
+        return context
+
+    def get_queryset(self):
+        """get_queryset，根据分类过滤 """
+        queryset = super().get_queryset()
+        category_id = self.kwargs.get('category_id')
+        return queryset.filter(category_id=category_id)
+
+class TagView(IndexView):
+    """重写get_context_data，用来获取上下文数据并传入模板"""
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        tag_id = self.kwargs.get('tag_id')
+        tag = get_object_or_404(Category,pk=tag_id)
+        context.update({
+            'tag':tag
+        })
+        return tag
+
+    def get_queryset(self):
+        """get_queryset，根据分类过滤 """
+        queryset = super().get_queryset()
+        tag_id = self.kwargs.get('tag_id')
+        return queryset.filter(tag_id=tag_id)

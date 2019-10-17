@@ -20,6 +20,10 @@ from blog.views import post_list,post_detail
 from config.views import links
 from .custom_site import custom_site
 
+from blog.views import MyView
+from blog.views import PostDetailView,PostListView
+from django.views.generic import TemplateView
+
 """
     URL参数解释
     url(<正则或字符串>,<view funtion>,<固定参数context>,<url的名称>)
@@ -43,8 +47,12 @@ urlpatterns = [
     url(r'^$', post_list, name='index'),  # 用户访问博客首页，把请求传递到post_list函数中
     url(r'^category/(?P<category_id>\d+)/$', post_list,name='category-list'), # (?P<category_id>\d+) 带分组正则表达
     url(r'^tag/(?P<tag_id>\d+)/$', post_list,name='tag-list'),
-    url(r'^post/(?P<post_id>\d+).html$', post_detail, name='post-detail'),
+    # url(r'^post/(?P<post_id>\d+).html$', post_detail, name='post-detail'),
     url(r'^links/$', links,name='links'),
+
+    # url(r'^about/$', MyView.as_view()),
+    url(r'^about/$', TemplateView.as_view(template_name="about.html")),
+    url(r'^post/(?P<pk>\d+).html$', PostDetailView.as_view(),name='post-detail'),
 
     url(r'^super_admin/', admin.site.urls, name='super-admin'),
     url(r'^admin/', custom_site.urls, name='dmin'),     # 基于URL上划分两套后台地址，一套管理用户，另一套管理业务
