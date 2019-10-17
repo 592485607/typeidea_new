@@ -23,6 +23,27 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    """ 获取分类,区分是否为导航，问题是会产生两次数据库请求，数据量小时可用if判断,
+        避免因queryset的懒惰性产生两次I/O操作 
+    """
+    @classmethod
+    def get_navs(cls):
+        # 这样只需查一次数据库，拿到数据后，在内存中处理数据
+        categories = cls.objects.filter(status=cls.STATUS_NORMAL)
+        nav_categories = []
+        normal_categories = []
+        for cate in categories:
+            if cate.is_nav:
+                nav_categories.append(cate)
+            else:
+                normal_categories.append(cate)
+        # nav_categories = categories.filter(is_nav = True)
+        # normal_categories = categories.filter(is_nav = False)
+        return {
+            'navs':nav_categories,
+            'categories':normal_categories,
+        }
+
 class Tag(models.Model):
     STATUS_NORMAL = 1
     STATUS_DELETE = 0

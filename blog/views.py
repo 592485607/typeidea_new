@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Post,Tag,Category
+from config.models import SideBar
 from django.http import HttpResponse
 
 # def post_list(request,category_id = None,tag_id = None):
@@ -63,16 +64,6 @@ from django.http import HttpResponse
 #     }
 #     return render(request,'blog/list.html',context=context)
 
-def post_detail(request,post_id):
-    # return render(request,'blog/detail.html',context=None,content_type=None,status=None,
-    #               using=None)
-    """ 使用Model从数据库中批量取数据，然后展示到页面  """
-    try:
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        post = None
-    return render(request, 'blog/detail.html', context={'post':post})
-
 """ 重构post_list视图：
     1.对于主函数post_list来说，只要通过tag_id拿到文章列表和tag对象
     2.造成post_list函数复杂根源是把多个URL的处理放在一起
@@ -96,4 +87,22 @@ def post_list(request,category_id = None,tag_id = None):
         'tag':tag,
         'post_list':post_list,
     }
+    context.update(Category.get_navs())
     return render(request,'blog/list.html',context=context)
+
+def post_detail(request,post_id):
+    # return render(request,'blog/detail.html',context=None,content_type=None,status=None,
+    #               using=None)
+    """ 使用Model从数据库中批量取数据，然后展示到页面  """
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        post = None
+    context = {
+        'post':post,
+        'sidebars':SideBar.get_all(),
+    }
+    context.update(Category.get_navs())
+    # return render(request, 'blog/detail.html', context={'post':post})
+    return render(request, 'blog/detail.html', context=context)
+
