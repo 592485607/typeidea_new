@@ -137,10 +137,6 @@ class MyView(View):
     def get(self,request):
         return HttpResponse('result')
 
-class PostDetailView(DeleteView):
-    model = Post
-    template_name = 'blog/detail.html'
-
 class CommonViewMixin:
     def get_context_data(self,**kwargs):
         context = super().get_context_data(*kwargs)
@@ -193,5 +189,11 @@ class TagView(IndexView):
     def get_queryset(self):
         """get_queryset，根据分类过滤 """
         queryset = super().get_queryset()
-        tag_id = self.kwargs.get('tag_id')
+        tag_id = self.kwargs.get('tag_id')  # self.kwargs中的数据其实是从URL定义中拿到的
         return queryset.filter(tag_id=tag_id)
+
+class PostDetailView(CommonViewMixin,DeleteView):
+    queryset = Post.latest_posts()
+    template_name = 'blog/detail.html'
+    context_object_name = 'post'
+    pk_url_kwarg = 'post_id'

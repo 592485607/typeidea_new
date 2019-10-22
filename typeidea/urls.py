@@ -17,12 +17,14 @@ from django.conf.urls import url
 from django.contrib import admin
 
 from blog.views import post_list,post_detail
+from blog.views import (
+    IndexView,CategoryView,TagView,PostDetailView
+)
 from config.views import links
 from .custom_site import custom_site
 
-from blog.views import MyView
-from blog.views import PostDetailView,PostListView
-from django.views.generic import TemplateView
+# from blog.views import MyView
+# from django.views.generic import TemplateView
 
 """
     URL参数解释
@@ -43,19 +45,36 @@ from django.views.generic import TemplateView
     reverse作用，通过name反向解析到URL地址;
     在URL定义中增加name
 """
+# urlpatterns = [
+#     url(r'^$', post_list, name='index'),  # 用户访问博客首页，把请求传递到post_list函数中
+#     url(r'^category/(?P<category_id>\d+)/$', post_list,name='category-list'), # (?P<category_id>\d+) 带分组正则表达
+#     url(r'^tag/(?P<tag_id>\d+)/$', post_list,name='tag-list'),
+#     # url(r'^post/(?P<post_id>\d+).html$', post_detail, name='post-detail'),
+#     url(r'^links/$', links,name='links'),
+#
+#     # url(r'^about/$', MyView.as_view()),
+#     url(r'^about/$', TemplateView.as_view(template_name="about.html")),
+#     url(r'^post/(?P<pk>\d+).html$', PostDetailView.as_view(),name='post-detail'),
+#
+#     url(r'^super_admin/', admin.site.urls, name='super-admin'),
+#     url(r'^admin/', custom_site.urls, name='dmin'),     # 基于URL上划分两套后台地址，一套管理用户，另一套管理业务
+# ]
+
+"""< !-- URL中如有多个参数，模板中使用也可以传递多个: { % url 'name' arg1, arg2 %} """
+
+"""使用类视图定义URL"""
 urlpatterns = [
-    url(r'^$', post_list, name='index'),  # 用户访问博客首页，把请求传递到post_list函数中
-    url(r'^category/(?P<category_id>\d+)/$', post_list,name='category-list'), # (?P<category_id>\d+) 带分组正则表达
-    url(r'^tag/(?P<tag_id>\d+)/$', post_list,name='tag-list'),
-    # url(r'^post/(?P<post_id>\d+).html$', post_detail, name='post-detail'),
+    url(r'^$', IndexView.as_view(), name='index'),  # 用户访问博客首页，把请求传递到post_list函数中
+    url(r'^category/(?P<category_id>\d+)/$', CategoryView.as_view(),
+        name='category-list'), # (?P<category_id>\d+) 带分组正则表达
+    url(r'^tag/(?P<tag_id>\d+)/$', TagView.as_view(),name='tag-list'),
+    url(r'^post/(?P<pk>\d+).html$', PostDetailView.as_view(), name='post-detail'),
     url(r'^links/$', links,name='links'),
 
     # url(r'^about/$', MyView.as_view()),
-    url(r'^about/$', TemplateView.as_view(template_name="about.html")),
-    url(r'^post/(?P<pk>\d+).html$', PostDetailView.as_view(),name='post-detail'),
+    # url(r'^about/$', TemplateView.as_view(template_name="about.html")),
+    # url(r'^post/(?P<post_id>\d+).html$', post_detail, name='post-detail'),
 
     url(r'^super_admin/', admin.site.urls, name='super-admin'),
     url(r'^admin/', custom_site.urls, name='dmin'),     # 基于URL上划分两套后台地址，一套管理用户，另一套管理业务
 ]
-
-"""< !-- URL中如有多个参数，模板中使用也可以传递多个: { % url 'name' arg1, arg2 %} """

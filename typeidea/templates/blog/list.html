@@ -3,11 +3,12 @@
 {% block title %}
 
     {% if tag %}
-    标签页：{{ tag.name }}
-    {% endif %}
+    标签列表页：{{ tag.name }}
 
-    {% if category %}
-    分类页：{{ category.name }}
+    {% elif category %}
+    分类列表页：{{ category.name }}
+    {% else %}
+    首页
     {% endif %}
 
 {% endblock %}
@@ -31,7 +32,7 @@
             <a href="?page={{ page_obj.previous_page_number }}">上一页</a>
              {% endif %}
             Page {{ page_obj.number }} of {{ paginator.num_pages }}.
-         {% if page_obj.has_next %}}
+         {% if page_obj.has_next %}
             <a href="?page={{ page_obj.next_page_number }}">下一页</a>
              {% endif %}
          {% endif %}
