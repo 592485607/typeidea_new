@@ -20,7 +20,7 @@
             <!--<a href="/post/{{ post.id }}.html">{{ post.title }}</a>-->
             <!-- 通过name(post-detail)反向解析到URL地址，post.id为传递的参数；
                  URL中如有多个参数，模板中使用也可以传递多个: { % url 'name' arg1, arg2 %}-->
-            <a href="{ url 'post-detail' post.id %}">{{ post.title }}</a>
+            <a href="{% url 'post-detail' post.id %}">{{ post.title }}</a>
             <div>
                 <span>分类：{{ post.category.name }}</span>
                 <span>作者：{{ post.owner.username }}</span>

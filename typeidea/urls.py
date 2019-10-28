@@ -20,6 +20,8 @@ from blog.views import post_list,post_detail
 from config.views import links
 from .custom_site import custom_site
 
+from django.urls import reverse
+
 # from blog.views import MyView
 # from django.views.generic import TemplateView
 
@@ -54,6 +56,7 @@ urlpatterns = [
     # url(r'^about/$', TemplateView.as_view(template_name="about.html")),
     # url(r'^post/(?P<pk>\d+).html$', PostDetailView.as_view(),name='post-detail'),
 ]
+
 
 """使用类视图定义URL"""
 # from blog.views import (

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, reverse, redirect
 from django.shortcuts import get_object_or_404
 from .models import Post,Tag,Category
 from config.models import SideBar
