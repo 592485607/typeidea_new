@@ -1,6 +1,7 @@
+from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 from django.db import models
-from django.template.loader import render_to_string
+
 
 """ 存放配置相关数据，如侧边栏，友链"""
 class Link(models.Model):
@@ -25,18 +26,24 @@ class Link(models.Model):
         return self.title
 
 class SideBar(models.Model):
+    DISPLAY_HTML = 1
+    DISPLAY_LATEST = 2
+    DISPLAY_HOT = 3
+    DISPLAY_COMMENT = 4
+    SIDE_TYPE = (
+        (DISPLAY_HTML, 'HTML'),
+        (DISPLAY_LATEST, '最新文章'),
+        (DISPLAY_HOT, '最热文章'),
+        (DISPLAY_COMMENT, '最近评论'),
+    )
+
     STATUS_SHOW = 1
     STATUS_HIDE = 0
     STATUS_ITEMS = (
         (STATUS_SHOW,'展示'),
         (STATUS_HIDE,'隐藏'),
     )
-    SIDE_TYPE = (
-        (1,'HTML'),
-        (2,'最新文章'),
-        (3,'最热文章'),
-        (4,'最近评论'),
-    )
+
 
     title = models.CharField(max_length=50,verbose_name='标题')
     display_type = models.PositiveIntegerField(default=1,choices=SIDE_TYPE,verbose_name='展示类型')
@@ -68,15 +75,15 @@ class SideBar(models.Model):
             context = {
                 'posts':Post.latest_posts()
             }
-            result= render_to_string('coonfig/blocks/sidebar_posts.html',context)
+            result= render_to_string('config/blocks/sidebar_posts.html', context)
         elif self.display_type == self.DISPLAY_HOT:
             context = {
                 'posts':Post.hot_posts()
             }
-            result= render_to_string('coonfig/blocks/sidebar_posts.html',context)
+            result= render_to_string('config/blocks/sidebar_posts.html', context)
         elif self.display_type == self.DISPLAY_COMMENT:
             context = {
                 'comments':Comment.objects.filter(status=Comment.STATUS_NORMAL)
             }
-            result= render_to_string('coonfig/blocks/sidebar_comments.html',context)
+            result= render_to_string('config/blocks/sidebar_comments.html', context)
         return result

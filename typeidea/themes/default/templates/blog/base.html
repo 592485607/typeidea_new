@@ -21,13 +21,14 @@
     <div>底部分类：
         {% for cate in categories %}
         <a href="/category/{{ cate.id }}/">{{ cate.name }}</a>
-        {% endfor %}}
+        {% endfor %}
     </div>
 
     <hr/>
     <div>侧边栏展示：
         {% for sidebar in sidebars %}
             <h4>{{ sidebar.title }}</h4>
+            <! -- {{ sidebar.content }} -->
             {{ sidebar.content_html }}
         {% endfor %}
     </div>

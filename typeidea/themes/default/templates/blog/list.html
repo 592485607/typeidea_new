@@ -17,11 +17,11 @@
      <ul>
         {% for post in post_list %}
         <li>
-            <!--<a href="/post/{{ post.id }}.html">{{ post.title }}</a>-->
-            <a href="{ url 'post-detail' post.id %}">{{ post.title }}</a>
+            <a href="/post/{{ post.id }}.html">{{ post.title }}</a>
+            <!--<a href="{ url 'post-detail' post.id %}">{{ post.title }}</a>-->
             <div>
-                <span>作者：{{ post.owner.username }}</span>
                 <span>分类：{{ post.category.name }}</span>
+                <span>作者：{{ post.owner.username }}</span>
             </div>
             <p>{{ post.desc }}</p>
         </li>

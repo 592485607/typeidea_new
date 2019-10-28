@@ -28,7 +28,8 @@ class Category(models.Model):
     """
     @classmethod
     def get_navs(cls):
-        # 这样只需查一次数据库，拿到数据后，在内存中处理数据
+        """ 获取所有分类,且查一次数据库，拿到数据后，在内存中处理数据
+        """
         categories = cls.objects.filter(status=cls.STATUS_NORMAL)
         nav_categories = []
         normal_categories = []
@@ -94,7 +95,7 @@ class Post(models.Model):
         return self.title
 
     """ 把获取最新文章(post)数据的操作放到Model层,
-        select_related方式解决部分链式查询N+1问题
+        select_related方式解决部分链式查询N+1问题（大部分的重复请求都在模板中产生）
      """
     @staticmethod
     def get_by_tag(tag_id):

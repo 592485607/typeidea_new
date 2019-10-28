@@ -51,7 +51,7 @@ from django.views.generic import DeleteView,ListView
 #             post_list = []
 #         else:
 #             post_list = tag.post_set.filter(status=Post.STATUS_NORMAL)
-#             print(post_list)
+#             # print(post_list)
 #     else:
 #         post_list = Post.objects.filter(status=Post.STATUS_NORMAL)
 #         if category_id:
@@ -82,7 +82,7 @@ def post_list(request,category_id = None,tag_id = None):
     if tag_id:
         post_list,tag = Post.get_by_tag(tag_id)
     elif category_id:
-        post_list,tag = Post.get_by_tag(tag_id)
+        post_list,tag = Post.get_by_tag(category_id)
     else:
         post_list = Post.latest_posts()
 
@@ -95,9 +95,17 @@ def post_list(request,category_id = None,tag_id = None):
     context.update(Category.get_navs())
     return render(request,'blog/list.html',context=context)
 
-def post_detail(request,post_id):
-    # return render(request,'blog/detail.html',context=None,content_type=None,status=None,
-    #               using=None)
+# def post_detail(request,post_id=None):
+#     # return render(request,'blog/detail.html',context=None,content_type=None,status=None,
+#     #               using=None)
+#     """ 使用Model从数据库中批量取数据，然后展示到页面  """
+#     try:
+#         post = Post.objects.get(id=post_id)
+#     except Post.DoesNotExist:
+#         post = None
+#     return render(request, 'blog/detail.html', context={'post':post})
+
+def post_detail(request,post_id=None):
     """ 使用Model从数据库中批量取数据，然后展示到页面  """
     try:
         post = Post.objects.get(id=post_id)
@@ -130,70 +138,70 @@ def post_detail(request,post_id):
     
     ListView 跟DetailView类似，但ListView是获取多条数据； 
 """
-class MyView(View):
-    """ 明显好处，解耦了HTTP 方法的请求，如GET，POST...等，
-        如果需要增加POST请求逻辑，不需要修改原有函数，只需要重写即可
-    """
-    def get(self,request):
-        return HttpResponse('result')
-
-class CommonViewMixin:
-    def get_context_data(self,**kwargs):
-        context = super().get_context_data(*kwargs)
-        context.update({
-            'sidebars':SideBar.get_all()
-        })
-        context.update(Category.get_navs())
-        return context
-
-class IndexView(CommonViewMixin,ListView):
-    """
-        queryset 中的数据需要根据当前选择的分类或标签进行过滤；
-        渲染到模板中的数据需要加上当前选择的分类数据。
-        故需要重写两个方法，一个是get_context_data，用来获取上下文数据并传入模板；
-        一个是get_queryset,用来获取指定Model或Queryset的数据
-    """
-    queryset = Post.latest_posts()
-    paginate_by = 1
-    context_object_name = 'post_list'   # 如果不设此项，在模板中需使用object_list 变量
-    template_name = 'blog/list.html'
-
-class CategoryView(IndexView):
-    """重写get_context_data，用来获取上下文数据并传入模板"""
-    def get_context_data(self,**kwargs):
-        context = super().get_context_data(**kwargs)
-        category_id = self.kwargs.get('category_id')
-        category = get_object_or_404(Category,pk=category_id)
-        context.update({
-            'category':category
-        })
-        return context
-
-    def get_queryset(self):
-        """get_queryset，根据分类过滤 """
-        queryset = super().get_queryset()
-        category_id = self.kwargs.get('category_id')
-        return queryset.filter(category_id=category_id)
-
-class TagView(IndexView):
-    """重写get_context_data，用来获取上下文数据并传入模板"""
-    def get_context_data(self,**kwargs):
-        context = super().get_context_data(**kwargs)
-        tag_id = self.kwargs.get('tag_id')  #
-        tag = get_object_or_404(Category,pk=tag_id) # 快捷方式，获取对象实例，如不存在，则抛出404错误
-        context.update({
-            'tag':tag
-        })
-        return tag
-
-    def get_queryset(self):
-        """get_queryset，根据分类过滤 """
-        queryset = super().get_queryset()
-        tag_id = self.kwargs.get('tag_id')  # self.kwargs中的数据其实是从URL定义中拿到的
-        return queryset.filter(tag_id=tag_id)
-
-class PostDetailView(CommonViewMixin,DeleteView):
-    queryset = Post.latest_posts()
-    template_name = 'blog/detail.html'
-    context_object_name = 'post'
-    pk_url_kwarg = 'post_id'
+# class MyView(View):
+#     """ 明显好处，解耦了HTTP 方法的请求，如GET，POST...等，
+#         如果需要增加POST请求逻辑，不需要修改原有函数，只需要重写即可
+#     """
+#     def get(self,request):
+#         return HttpResponse('result')
+#
+# class CommonViewMixin:
+#     def get_context_data(self,**kwargs):
+#         context = super().get_context_data(*kwargs)
+#         context.update({
+#             'sidebars':SideBar.get_all()
+#         })
+#         context.update(Category.get_navs())
+#         return context
+#
+# class IndexView(CommonViewMixin,ListView):
+#     """
+#         queryset 中的数据需要根据当前选择的分类或标签进行过滤；
+#         渲染到模板中的数据需要加上当前选择的分类数据。
+#         故需要重写两个方法，一个是get_context_data，用来获取上下文数据并传入模板；
+#         一个是get_queryset,用来获取指定Model或Queryset的数据
+#     """
+#     queryset = Post.latest_posts()
+#     paginate_by = 1
+#     context_object_name = 'post_list'   # 如果不设此项，在模板中需使用object_list 变量
+#     template_name = 'blog/list.html'
+#
+# class CategoryView(IndexView):
+#     """重写get_context_data，用来获取上下文数据并传入模板"""
+#     def get_context_data(self,**kwargs):
+#         context = super().get_context_data(**kwargs)
+#         category_id = self.kwargs.get('category_id')
+#         category = get_object_or_404(Category,pk=category_id)
+#         context.update({
+#             'category':category
+#         })
+#         return context
+#
+#     def get_queryset(self):
+#         """get_queryset，根据分类过滤 """
+#         queryset = super().get_queryset()
+#         category_id = self.kwargs.get('category_id')
+#         return queryset.filter(category_id=category_id)
+#
+# class TagView(IndexView):
+#     """重写get_context_data，用来获取上下文数据并传入模板"""
+#     def get_context_data(self,**kwargs):
+#         context = super().get_context_data(**kwargs)
+#         tag_id = self.kwargs.get('tag_id')  #
+#         tag = get_object_or_404(Category,pk=tag_id) # 快捷方式，获取对象实例，如不存在，则抛出404错误
+#         context.update({
+#             'tag':tag
+#         })
+#         return tag
+#
+#     def get_queryset(self):
+#         """get_queryset，根据分类过滤 """
+#         queryset = super().get_queryset()
+#         tag_id = self.kwargs.get('tag_id')  # self.kwargs中的数据其实是从URL定义中拿到的
+#         return queryset.filter(tag_id=tag_id)
+#
+# class PostDetailView(CommonViewMixin,DeleteView):
+#     queryset = Post.latest_posts()
+#     template_name = 'blog/detail.html'
+#     context_object_name = 'post'
+#     pk_url_kwarg = 'post_id'

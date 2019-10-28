@@ -11,6 +11,7 @@
 {% endblock %}
 
 {% block main %}
+    {% for post in post_list %}
     <div class="card post">
         <div class="card-body">
             <h5 class="card-title"><a href="{% url 'post-detail' post.id %}">
@@ -28,6 +29,7 @@
                 完整内容</a> </p>
         </div>
     </div>
+    {% endfor %}
 
     {% if page_obj %}
     {% if page_obj.has_previous %}

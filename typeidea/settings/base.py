@@ -58,7 +58,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'typeidea.urls'
 
-THEMES = 'bootstrap'
+# THEMES = 'bootstrap'
+THEMES = 'default'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -74,6 +75,7 @@ TEMPLATES = [
         },
     },
 ]
+
 # TEMPLATES = [
 #     {
 #         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -140,4 +142,10 @@ USE_TZ = True   # ∆Ù”√ ±«¯
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
+# STATIC_ROOT = '/tmp/static'
+
 STATIC_URL = '/static/'
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'themes', THEMES, 'static')
+# ]
