@@ -67,16 +67,13 @@ from .custom_site import custom_site
 from blog.views import (
     IndexView,CategoryView,TagView,PostDetailView,
 )
+
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
-    url(r'^category/(?P<category_id>\d+)/$', CategoryView.as_view(),name='category-list'),
     url(r'^tag/(?P<tag_id>\d+)/$', TagView.as_view(),name='tag-list'),
     url(r'^post/(?P<post_id>\d+).html$', PostDetailView.as_view(), name='post-detail'),
+    url(r'^category/(?P<category_id>\d+)/$', CategoryView.as_view(), name='category-list'),
     url(r'^links/$', links,name='links'),
-
-    # url(r'^about/$', MyView.as_view()),
-    # url(r'^about/$', TemplateView.as_view(template_name="about.html")),
-    # url(r'^post/(?P<post_id>\d+).html$', post_detail, name='post-detail'),
 
     url(r'^super_admin/', admin.site.urls, name='super-admin'),
     url(r'^admin/', custom_site.urls, name='dmin'),     # 基于URL上划分两套后台地址，一套管理用户，另一套管理业务

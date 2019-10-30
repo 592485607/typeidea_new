@@ -22,9 +22,7 @@
                 <ul class="navbar-nav mr-auto">
                 {% for cate in navs %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'category-list' cate.id %}">
-                            {{ cate.name }}
-                        </a>
+                        <a class="nav-link" href="{% url 'category-list' cate.id %}">{{ cate.name }}</a>
                     </li>
                 {% endfor %}
                 </ul>
@@ -47,6 +45,7 @@
             <div class="col-9 post-list">
                  <!--block main 页面住内容区  -->
                 {% block main %}
+
                 {% endblock %}
             </div>
             <div class="col-3">
@@ -67,16 +66,14 @@
         </div>
     </div>
 
-    <footer class="footrer">
+    <footer class="footer">
         <!--block footer 底部分类  -->
         {% block footer %}
          <div class="container">
             <hr/>
             <nav class="nav category">
                 {% for cate in categories %}
-                    <a href="{% url 'category-list' cate.id %}" class="nav-link">
-                        {{ cate.name }}
-                    </a>
+                    <a href="{% url 'category-list' cate.id %}" class="nav-link">{{ cate.name }}</a>
                 {% endfor %}
             </nav>
         </div>

@@ -174,7 +174,7 @@ class IndexView(CommonViewMixin,ListView):
         一个是get_queryset,用来获取指定Model或Queryset的数据
     """
     queryset = Post.latest_posts()
-    paginate_by = 5
+    paginate_by = 2
     context_object_name = 'post_list'   # 如果不设此项，在模板中需使用object_list 变量
     template_name = 'blog/list.html'
 
@@ -185,7 +185,7 @@ class CategoryView(IndexView):
         category_id = self.kwargs.get('category_id')
         category = get_object_or_404(Category,pk=category_id)
         context.update({
-            'category':category
+            'category':category,
         })
         return context
 
@@ -199,10 +199,10 @@ class TagView(IndexView):
     """重写get_context_data，用来获取上下文数据并传入模板"""
     def get_context_data(self,**kwargs):
         context = super().get_context_data(**kwargs)
-        tag_id = self.kwargs.get('tag_id')  #
-        tag = get_object_or_404(Category,pk=tag_id) # 快捷方式，获取对象实例，如不存在，则抛出404错误
+        tag_id = self.kwargs.get('tag_id')
+        tag = get_object_or_404(Tag,pk=tag_id) # 快捷方式，获取对象实例，如不存在，则抛出404错误
         context.update({
-            'tag':tag
+            'tag':tag,
         })
         return context
 
@@ -210,7 +210,7 @@ class TagView(IndexView):
         """get_queryset，根据分类过滤 """
         queryset = super().get_queryset()
         tag_id = self.kwargs.get('tag_id')  # self.kwargs中的数据其实是从URL定义中拿到的
-        return queryset.filter(tag_id=tag_id)
+        return queryset.filter(tag__id=tag_id)
 
 class PostDetailView(CommonViewMixin,DetailView):
     queryset = Post.latest_posts()

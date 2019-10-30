@@ -58,8 +58,8 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'typeidea.urls'
 
-# THEMES = 'bootstrap'
-THEMES = 'default'
+THEMES = 'bootstrap'
+# THEMES = 'default'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
