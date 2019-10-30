@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '$dlek7wrm5@%50_2v5)j)xz+4w!85^mcy)mqbt-yk1pt+5wq7_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -142,10 +142,13 @@ USE_TZ = True   # 启用时区
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-# STATIC_ROOT = '/tmp/static'
+# 部署之后静态资源路径
+STATIC_ROOT = '/tmp/static'
 
+# 静态资源开始路径
 STATIC_URL = '/static/'
 
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, 'themes', THEMES, 'static')
-# ]
+# 指定静态资源所在目录
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'themes', THEMES, 'static')
+]

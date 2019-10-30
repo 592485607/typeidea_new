@@ -210,7 +210,7 @@ class TagView(IndexView):
         """get_queryset，根据分类过滤 """
         queryset = super().get_queryset()
         tag_id = self.kwargs.get('tag_id')  # self.kwargs中的数据其实是从URL定义中拿到的
-        return queryset.filter(tag__id=tag_id)
+        return queryset.filter(tag__id=tag_id)  # 跨表查询的显著特点是__双下划线
 
 class PostDetailView(CommonViewMixin,DetailView):
     queryset = Post.latest_posts()
