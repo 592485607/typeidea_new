@@ -1,8 +1,12 @@
+from django.db.models import Q  # Django提供的条件表达式，完成复杂操作
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from .models import Post,Tag,Category
 from config.models import SideBar
 from django.http import HttpResponse
+
+from comment.forms import CommentForm
+from comment.models import Comment
 
 from django.views import View
 from django.views.generic import DetailView,ListView
@@ -174,7 +178,7 @@ class IndexView(CommonViewMixin,ListView):
         一个是get_queryset,用来获取指定Model或Queryset的数据
     """
     queryset = Post.latest_posts()
-    paginate_by = 2
+    paginate_by = 3
     context_object_name = 'post_list'   # 如果不设此项，在模板中需使用object_list 变量
     template_name = 'blog/list.html'
 
@@ -217,4 +221,39 @@ class PostDetailView(CommonViewMixin,DetailView):
     template_name = 'blog/detail.html'
     context_object_name = 'post'
     pk_url_kwarg = 'post_id'
+
+    # def get_context_data(self,**kwargs):
+    #     """通过View层把CommentForm和评论的数据传递到模板层"""
+    #     context = super().get_context_data(**kwargs)
+    #     context.update({
+    #         'comment_form':CommentForm,
+    #         'comment_list':Comment.get_by_target(self.request.path),
+    #     })
+    #     return context
+
+# 增加搜索功能
+class SearchView(IndexView):
+    """重写get_context_data，用来获取上下文数据并传入模板"""
+    def get_context_data(self):
+        context = super().get_context_data()
+        context.update({
+            'keyword':self.request.GET.get('keyword', '')
+        })
+        return context
+
+    def get_queryset(self):
+        """get_queryset，根据分类过滤 """
+        queryset = super().get_queryset()
+        keyword = self.request.GET.get('keyword')
+        if not keyword:
+            return queryset
+        return queryset.filter(Q(title__icontains=keyword) | Q(desc__icontains=keyword))
+
+# 增加作者页面
+class AuthorView(IndexView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        author_id = self.kwargs.get('owner_id')
+        return queryset.filter(owner_id=author_id)
+
 

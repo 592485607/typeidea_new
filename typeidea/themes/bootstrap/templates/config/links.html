@@ -2,26 +2,26 @@
 {% block title %}友情链接{% endblock %}
 
 {% block main %}
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">名称</th>
+        <th scope="col">网址</th>
+    </tr>
+    </thead>
 
-{% if post %}
-    <div class="card post">
-        <div class="card-body">
-                <h5 class="card-title"><a href="{% url 'post-detail' post.id %}">
-                {{ post.title }}</a></h5>
-            <span class="card-link">作者：<a href="#">{{ post.owner.username }}
-                </a> </span>
-            <span class="card-link">分类：<a href="{% url 'category-list' post.category_id %}">
-                {{ post.category.name }}</a> </span>
-            <span class="card-link">标签：
-                {% for tag in post.tag.all %}
-                <a href="{% url 'tag-list' tag.id %}">{{ tag.name }}</a>
-                {% endfor %}
-            </span>
-            <p class="card-text">{{ post.content }} </p>
-    {% endif %}
-        </div>
-    </div>
-
+<body>
+    {% for link in link_list %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ link.title }}</td>
+            <td><a href="{{ link.href }}">{{ link.href }}</a> </td>
+            <hr/>
+        </tr>
+    {% endfor %}
+</body>
+</table>
 
 <hr/>
 <div class="comment">
