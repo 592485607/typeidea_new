@@ -2,6 +2,14 @@
 {% load comment_block %}
 {% block title %}友情链接{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet"
+      href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/googlecode.min.css">
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js">
+</script>
+<script>h1js.initHighlightingOnLoad();</script>
+{% endblock %}
+
 {% block main %}
 
 {% if post %}
@@ -18,7 +26,12 @@
                 <a href="{% url 'tag-list' tag.id %}">{{ tag.name }}</a>
                 {% endfor %}
             </span>
-            <p class="card-text">{{ post.content }} </p>
+            <p class="card-text">
+                {% autoescape off %}
+                {{ post.content_html }}
+                {% endautoescape %}
+             </p>
+            <!--<p class="card-text">{{ post.content }} </p>-->
     {% endif %}
         </div>
     </div>

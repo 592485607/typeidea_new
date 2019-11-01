@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+import mistune
 
 """ 存放内容相关数据"""
 class Category(models.Model):
@@ -85,6 +86,7 @@ class Post(models.Model):
     """ 调整模型，增加字段pv,uv，统计文章访问量 """
     pv = models.PositiveIntegerField(default=1)
     uv = models.PositiveIntegerField(default=1)
+    content_html = models.TextField(verbose_name="正文html代码",blank=True,editable=False)
 
     class Meta:
         # 通过Meta配置它的展示名称为文章，排序规则根据 id 进行降序排列
@@ -93,6 +95,10 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self,*args,**kwargs):
+        self.content_html = mistune.markdown(self.content)
+        super().save(*args,**kwargs)
 
     """ 把获取最新文章(post)数据的操作放到Model层,
         select_related方式解决部分链式查询N+1问题（大部分的重复请求都在模板中产生）
@@ -130,4 +136,5 @@ class Post(models.Model):
     @classmethod
     def hot_posts(cls):
         return cls.objects.filter(status=cls.STATUS_NORMAL).order_by('-pv')
+
 

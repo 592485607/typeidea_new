@@ -1,3 +1,4 @@
+
 <hr/>
 <div class="comment">
     <form class="form-group" action="/comment/" method="POST">
@@ -16,7 +17,9 @@
                 <span>{{ comment.created_time }}</span>
             </div>
             <div class="comment-content">
+                {% autoescape off %}   <!-- 关闭django 模板自动转换功能 -->
                 {{ comment.content }}
+                {% endautoescape %}
             </div>
         </li>
          {% endfor %}
