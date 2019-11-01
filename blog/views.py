@@ -1,4 +1,4 @@
-from django.db.models import Q  # Django提供的条件表达式，完成复杂操作
+from django.db.models import Q, F  # Django提供的条件表达式，完成复杂操作
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from .models import Post,Tag,Category
@@ -230,6 +230,17 @@ class PostDetailView(CommonViewMixin,DetailView):
     #         'comment_list':Comment.get_by_target(self.request.path),
     #     })
     #     return context
+
+    """ 重写get方法，当用户请求文章时，对当前文章的PV和UV进行+1操作 """
+    def get(self,request,*args,**kwargs):
+        response = super().get(request,*args,**kwargs)
+        Post.objects.filter(pk=self.object.id).update(pv=F('pv')+1,uv=F('uv')+1)
+
+        # 调试用
+        from django.db import  connection
+        print(connection.queries)
+
+        return response
 
 # 增加搜索功能
 class SearchView(IndexView):
