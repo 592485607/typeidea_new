@@ -1,3 +1,4 @@
+from datetime import date # 文件第一行
 from django.db.models import Q, F  # Django提供的条件表达式，完成复杂操作
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
@@ -230,6 +231,14 @@ class PostDetailView(CommonViewMixin,DetailView):
     #         'comment_list':Comment.get_by_target(self.request.path),
     #     })
     #     return context
+
+    """ 增加uv和pv访问统计 """
+    def get(self,request,*args,**kwargs):
+        response = super().get(request,*args,**kwargs)
+        self.handle_visited()
+        return response
+
+
 
     """ 重写get方法，当用户请求文章时，对当前文章的PV和UV进行+1操作 """
     def get(self,request,*args,**kwargs):
