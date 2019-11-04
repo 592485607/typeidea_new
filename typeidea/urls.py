@@ -73,6 +73,10 @@ from config.views import (
 from comment.views import (
     CommentView,
 )
+from django.contrib.sitemaps import views as sitemap_views
+from blog.rss import LatestPostFeed
+from blog.sitemap import PostSitemap
+
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^tag/(?P<tag_id>\d+)/$', TagView.as_view(),name='tag-list'),
@@ -82,6 +86,8 @@ urlpatterns = [
     url(r'^author/(?P<owner_id>\d+)/$', AuthorView.as_view(), name='author'),
     url(r'^links/$', LinkListView.as_view(),name='links'),
     url(r'^comment/$', CommentView.as_view(),name='comment'),
+    url(r'^rss|feed/', LatestPostFeed(),name='rss'),
+    url(r'^sitemap\.xml$', sitemap_views.sitemap,{'sitemaps':{'posts':PostSitemap}}),
 
     url(r'^super_admin/', admin.site.urls, name='super-admin'),
     url(r'^admin/', custom_site.urls, name='dmin'),     # 基于URL上划分两套后台地址，一套管理用户，另一套管理业务

@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 import mistune
 
+from django.utils.functional import cached_property
+
 """ 存放内容相关数据"""
 class Category(models.Model):
     STATUS_NORMAL = 1
@@ -137,4 +139,7 @@ class Post(models.Model):
     def hot_posts(cls):
         return cls.objects.filter(status=cls.STATUS_NORMAL).order_by('-pv')
 
+    @cached_property
+    def tags(self):
+        return ','.join(self.tag.values_list('name',flat=True))
 
