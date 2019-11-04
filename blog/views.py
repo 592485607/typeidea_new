@@ -238,6 +238,29 @@ class PostDetailView(CommonViewMixin,DetailView):
         self.handle_visited()
         return response
 
+    def handle_visited(self):
+        increase_pv = False
+        increase_uv = False
+        uid = self.request.uid
+        pv_key = 'pv:%s:%s' % (uid,self.request.path)
+        uv_key = 'uv:%s:%s:%s' % (uid,str(date.today()),self.request.path)
+        if not cache.get(pv_key):
+            increase_pv = True
+            cache.set(pv_key,1,1*60) #1分钟有效
+
+        if not cache.get(uv_key):
+            increase_uv = True
+            cache.set(uv_key,1,24*60*60) #24小时有效
+
+        if increase_pv and increase_uv:
+            Post.objects.filter(pk=self.object.id).update(pv=F('pv')+1,
+                                                          uv=F('uv')+1)
+        elif increase_pv:
+            Post.objects.filter(pk=self.object.id).update(pv=F('pv') + 1)
+
+        elif increase_uv:
+            Post.objects.filter(pk=self.object.id).update(pv=F('uv') + 1)
+
 
 
     """ 重写get方法，当用户请求文章时，对当前文章的PV和UV进行+1操作 """
